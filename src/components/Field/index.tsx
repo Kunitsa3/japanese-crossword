@@ -4,7 +4,7 @@ import { twMerge } from 'tw-merge';
 
 export type FieldValue = 'X' | 1 | 0;
 
-type SetField = Dispatch<SetStateAction<FieldValue[][]>>;
+export type SetField = Dispatch<SetStateAction<FieldValue[][]>>;
 
 interface FieldProps {
   fieldValues: FieldValue[][];
@@ -17,21 +17,73 @@ const FIELD_STATE_MAPPER = {
   X: 0,
 } as const;
 
+const isCellInRange = (
+  { clickedCellRowIndex, clickedCellColumnIndex }: { clickedCellRowIndex: number; clickedCellColumnIndex: number },
+  { currentCellRowIndex, currentCellColumnIndex }: { currentCellRowIndex: number; currentCellColumnIndex: number },
+  { rowIndex: lastColoredRowIndex, columnIndex: lastColoredColumnIndex }: { rowIndex: number; columnIndex: number }
+) => {
+  return (
+    currentCellRowIndex >= Math.min(lastColoredRowIndex, clickedCellRowIndex) &&
+    currentCellRowIndex <= Math.max(lastColoredRowIndex, clickedCellRowIndex) &&
+    currentCellColumnIndex >= Math.min(lastColoredColumnIndex, clickedCellColumnIndex) &&
+    currentCellColumnIndex <= Math.max(lastColoredColumnIndex, clickedCellColumnIndex)
+  );
+};
+
 export const Field: FC<FieldProps> = ({ fieldValues, setField }) => {
   const [hoverColumnIndex, setHoverColumnIndex] = useState<number | null>(null);
+  const [lastColoredCell, setLastColoredCell] = useState<{ rowIndex: number; columnIndex: number; value: FieldValue }>({
+    rowIndex: 0,
+    columnIndex: 0,
+    value: 1,
+  });
 
-  const onCellClick = (rowIndex: number, cellIndex: number) => {
-    const finalField = fieldValues.map((row, index) => {
-      const finalRow = [...row];
+  const onCellClick = (
+    clickedCellRowIndex: number,
+    clickedCellColumnIndex: number,
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    if (!e.shiftKey) {
+      setField(
+        fieldValues.map((row, currentCellRowIndex) =>
+          row.map((cellValue, oldColumnIndex) => {
+            if (clickedCellColumnIndex === oldColumnIndex && clickedCellRowIndex === currentCellRowIndex) {
+              const value = FIELD_STATE_MAPPER[cellValue];
 
-      if (rowIndex === index) {
-        finalRow[cellIndex] = FIELD_STATE_MAPPER[finalRow[cellIndex]];
-      }
+              setLastColoredCell({ rowIndex: clickedCellRowIndex, columnIndex: clickedCellColumnIndex, value });
+              return value;
+            }
 
-      return finalRow;
+            return cellValue;
+          })
+        )
+      );
+
+      return;
+    }
+
+    setField(
+      fieldValues.map((row, currentCellRowIndex) =>
+        row.map((cellValue, currentCellColumnIndex) => {
+          if (
+            isCellInRange(
+              { clickedCellRowIndex, clickedCellColumnIndex },
+              { currentCellRowIndex, currentCellColumnIndex },
+              lastColoredCell
+            )
+          ) {
+            return lastColoredCell.value;
+          }
+          return cellValue;
+        })
+      )
+    );
+
+    setLastColoredCell({
+      rowIndex: clickedCellRowIndex,
+      columnIndex: clickedCellColumnIndex,
+      value: lastColoredCell.value,
     });
-
-    setField(finalField);
   };
 
   return (
@@ -52,7 +104,7 @@ export const Field: FC<FieldProps> = ({ fieldValues, setField }) => {
                   cell === 1 && 'bg-gray-600'
                 )
               )}
-              onClick={() => onCellClick(rowIndex, cellIndex)}
+              onClick={e => onCellClick(rowIndex, cellIndex, e)}
               onMouseEnter={() => setHoverColumnIndex(cellIndex)}
               onMouseLeave={() => setHoverColumnIndex(null)}
             >
