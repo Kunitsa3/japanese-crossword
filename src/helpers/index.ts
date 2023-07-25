@@ -1,4 +1,4 @@
-import { FieldValue } from '../components/Field';
+import { FieldValue } from '../components/Crossword/Field';
 
 interface Pictures {
   home: {
