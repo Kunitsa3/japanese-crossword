@@ -1,9 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Path, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Button } from '../../../common/Button';
-import { useSelector } from 'react-redux';
-import store from '../../../../store';
+import { Button } from '@/components/common/Button';
+import store, { useAppSelector } from '@/store';
 import { useToast } from '@/components/ui/use-toast';
 import Spinner from '@/components/common/Spinner';
 import { useEffect } from 'react';
@@ -37,8 +36,8 @@ export const AuthForm = <T extends z.Schema<any, any>>({
     resolver: zodResolver(validationSchema),
   });
 
-  const authenticationLoadingStatus = useSelector((state: RootState) => state.currentUser.loading);
-  const errorMessage = useSelector((state: RootState) => state.currentUser.errorMessage);
+  const authenticationLoadingStatus = useAppSelector(state => state.user.loading);
+  const errorMessage = useAppSelector(state => state.user.errorMessage);
   const { toast } = useToast();
 
   useEffect(() => {

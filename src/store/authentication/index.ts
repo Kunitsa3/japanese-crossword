@@ -1,9 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchSignInUser, fetchSignUpUser } from './asyncThunks';
+import { signInUser, signUpUser } from './asyncThunks';
 import { UserDetails } from '../../server/services/user';
 
 interface InitialState {
-  currentUser: null | UserDetails;
+  currentUser: UserDetails | null;
   loading: boolean;
   errorMessage: string;
 }
@@ -14,37 +14,37 @@ const initialState: InitialState = {
   errorMessage: '',
 };
 
-const usersSlice = createSlice({
-  name: 'users',
+const userSlice = createSlice({
+  name: 'user',
   initialState,
   reducers: {},
   extraReducers(builder) {
     builder
-      .addCase(fetchSignInUser.pending, state => {
+      .addCase(signInUser.pending, state => {
         state.loading = true;
         state.errorMessage = '';
       })
-      .addCase(fetchSignInUser.fulfilled, (state, action) => {
+      .addCase(signInUser.fulfilled, (state, action) => {
         state.loading = false;
         state.currentUser = action.payload;
       })
-      .addCase(fetchSignInUser.rejected, (state, action) => {
+      .addCase(signInUser.rejected, (state, action) => {
         state.loading = false;
         state.errorMessage = action.error.message || '';
       })
-      .addCase(fetchSignUpUser.pending, state => {
+      .addCase(signUpUser.pending, state => {
         state.loading = true;
         state.errorMessage = '';
       })
-      .addCase(fetchSignUpUser.fulfilled, (state, action) => {
+      .addCase(signUpUser.fulfilled, (state, action) => {
         state.loading = false;
         state.currentUser = action.payload;
       })
-      .addCase(fetchSignUpUser.rejected, (state, action) => {
+      .addCase(signUpUser.rejected, (state, action) => {
         state.loading = false;
         state.errorMessage = action.error.message || '';
       });
   },
 });
 
-export default usersSlice.reducer;
+export default userSlice.reducer;

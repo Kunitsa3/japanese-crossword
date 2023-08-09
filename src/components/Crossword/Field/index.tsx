@@ -1,15 +1,16 @@
-import clsx from 'clsx';
-import { FC, Dispatch, SetStateAction, useState } from 'react';
-import { twMerge } from 'tw-merge';
+import { FieldValue } from '@/store/pictures';
+import { FC, Dispatch, useState } from 'react';
+import { FieldCell } from './FieldCell';
 
-export type FieldValue = 'X' | 1 | 0;
-
-export type SetField = Dispatch<SetStateAction<FieldValue[][]>>;
+export type SetField = Dispatch<FieldValue[][]>;
 
 interface FieldProps {
   fieldValues: FieldValue[][];
   setField: SetField;
+  isCreatingMode?: boolean;
 }
+
+type LastColoredCell = { rowIndex: number; columnIndex: number; value: FieldValue };
 
 const FIELD_STATE_MAPPER = {
   0: 1,
@@ -17,22 +18,15 @@ const FIELD_STATE_MAPPER = {
   X: 0,
 } as const;
 
-const isCellInRange = (
-  { clickedCellRowIndex, clickedCellColumnIndex }: { clickedCellRowIndex: number; clickedCellColumnIndex: number },
-  { currentCellRowIndex, currentCellColumnIndex }: { currentCellRowIndex: number; currentCellColumnIndex: number },
-  { rowIndex: lastColoredRowIndex, columnIndex: lastColoredColumnIndex }: { rowIndex: number; columnIndex: number }
-) => {
-  return (
-    currentCellRowIndex >= Math.min(lastColoredRowIndex, clickedCellRowIndex) &&
-    currentCellRowIndex <= Math.max(lastColoredRowIndex, clickedCellRowIndex) &&
-    currentCellColumnIndex >= Math.min(lastColoredColumnIndex, clickedCellColumnIndex) &&
-    currentCellColumnIndex <= Math.max(lastColoredColumnIndex, clickedCellColumnIndex)
-  );
-};
+const CREATION_FIELD_STATE_MAPPER = {
+  0: 1,
+  1: 0,
+  X: 0,
+} as const;
 
-export const Field: FC<FieldProps> = ({ fieldValues, setField }) => {
+export const Field: FC<FieldProps> = ({ fieldValues, setField, isCreatingMode }) => {
   const [hoverColumnIndex, setHoverColumnIndex] = useState<number | null>(null);
-  const [lastColoredCell, setLastColoredCell] = useState<{ rowIndex: number; columnIndex: number; value: FieldValue }>({
+  const [lastColoredCell, setLastColoredCell] = useState<LastColoredCell>({
     rowIndex: 0,
     columnIndex: 0,
     value: 1,
@@ -43,73 +37,60 @@ export const Field: FC<FieldProps> = ({ fieldValues, setField }) => {
     clickedCellColumnIndex: number,
     e: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
-    if (!e.shiftKey) {
-      setField(
-        fieldValues.map((row, currentCellRowIndex) =>
-          row.map((cellValue, oldColumnIndex) => {
-            if (clickedCellColumnIndex === oldColumnIndex && clickedCellRowIndex === currentCellRowIndex) {
-              const value = FIELD_STATE_MAPPER[cellValue];
-
-              setLastColoredCell({ rowIndex: clickedCellRowIndex, columnIndex: clickedCellColumnIndex, value });
-              return value;
-            }
-
-            return cellValue;
-          })
-        )
-      );
-
-      return;
-    }
+    const oldCellValue = fieldValues[clickedCellRowIndex][clickedCellColumnIndex];
+    const newCellValue = (isCreatingMode ? CREATION_FIELD_STATE_MAPPER : FIELD_STATE_MAPPER)[oldCellValue];
+    const firstCellInRange = e.shiftKey
+      ? lastColoredCell
+      : {
+          rowIndex: clickedCellRowIndex,
+          columnIndex: clickedCellColumnIndex,
+          value: newCellValue,
+        };
 
     setField(
-      fieldValues.map((row, currentCellRowIndex) =>
-        row.map((cellValue, currentCellColumnIndex) => {
-          if (
-            isCellInRange(
-              { clickedCellRowIndex, clickedCellColumnIndex },
-              { currentCellRowIndex, currentCellColumnIndex },
-              lastColoredCell
-            )
-          ) {
-            return lastColoredCell.value;
-          }
-          return cellValue;
-        })
-      )
+      fieldValues.map((row, currentCellRowIndex) => {
+        if (
+          currentCellRowIndex >= Math.min(firstCellInRange.rowIndex, clickedCellRowIndex) &&
+          currentCellRowIndex <= Math.max(firstCellInRange.rowIndex, clickedCellRowIndex)
+        ) {
+          const firstItemToRemove = Math.min(firstCellInRange.columnIndex, clickedCellColumnIndex);
+          const numberOfItemsToRemove = Math.abs(firstCellInRange.columnIndex - clickedCellColumnIndex) + 1;
+          const itemsToFill = new Array(numberOfItemsToRemove).fill(firstCellInRange.value);
+
+          const newRow = [...row];
+
+          newRow.splice(firstItemToRemove, numberOfItemsToRemove, ...itemsToFill);
+
+          return newRow;
+        }
+
+        return row;
+      })
     );
 
     setLastColoredCell({
       rowIndex: clickedCellRowIndex,
       columnIndex: clickedCellColumnIndex,
-      value: lastColoredCell.value,
+      value: firstCellInRange.value,
     });
   };
 
   return (
-    <div className="flex flex-col items-center ">
+    <div className="flex flex-col items-center border-l-2 border-t-2 border-l-slate-600 border-t-slate-600">
       {fieldValues.map((row, rowIndex) => (
         <div
           className="flex bg-gray-100 hover:bg-gray-300 [&:nth-child(5n)]:border-b-2 [&:nth-child(5n)]:border-b-slate-600"
           key={rowIndex}
         >
           {row.map((cell, cellIndex) => (
-            <div
+            <FieldCell
+              cell={cell}
+              cellIndex={cellIndex}
+              hoverColumnIndex={hoverColumnIndex}
+              setHoverColumnIndex={setHoverColumnIndex}
+              onCellClick={e => onCellClick(rowIndex, cellIndex, e)}
               key={cellIndex}
-              className={twMerge(
-                clsx(
-                  `flex h-4 w-4 cursor-pointer items-center justify-center border border-slate-300`,
-                  '[&:nth-child(5n)]:border-r-2 [&:nth-child(5n)]:border-r-slate-600',
-                  cellIndex === hoverColumnIndex && 'bg-gray-300',
-                  cell === 1 && 'bg-gray-600'
-                )
-              )}
-              onClick={e => onCellClick(rowIndex, cellIndex, e)}
-              onMouseEnter={() => setHoverColumnIndex(cellIndex)}
-              onMouseLeave={() => setHoverColumnIndex(null)}
-            >
-              {cell === 'X' ? cell : ''}
-            </div>
+            />
           ))}
         </div>
       ))}

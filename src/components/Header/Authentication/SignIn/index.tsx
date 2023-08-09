@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { fetchSignInUser } from '../../../../store/authentication/asyncThunks';
+import { signInUser } from '@/store/authentication/asyncThunks';
 import { AuthForm } from '../AuthForm';
 import { FC } from 'react';
-import { HelperText } from '../../../common/HelperText';
+import { HelperText } from '../HelperText';
 import { useAppDispatch } from '@/store';
 
 const validationSchema = z.object({
@@ -33,7 +33,7 @@ export const SignIn: FC<SignInProps> = ({ setSignUpModalOpened }) => {
           },
         ]}
         validationSchema={validationSchema}
-        onSubmit={data => dispatch(fetchSignInUser(data))}
+        onSubmit={data => dispatch(signInUser(data))}
         title="Sign In"
       />
       <HelperText text="Don't have an account?" linkText="Sign up" onClick={setSignUpModalOpened} />

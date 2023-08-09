@@ -1,11 +1,11 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { createUser, signInUser } from '../../server/controllers/user';
+import * as userController from '../../server/controllers/user';
 import { UserDetails } from '../../server/services/user';
 
-export const fetchSignInUser = createAsyncThunk('/signInUser', async (userDetails: UserDetails) => {
-  return await signInUser(userDetails);
+export const signInUser = createAsyncThunk('/signInUser', async (userDetails: UserDetails) => {
+  return await userController.signInUser(userDetails);
 });
 
-export const fetchSignUpUser = createAsyncThunk('/signUpUser', async (userDetails: UserDetails) => {
-  return await createUser(userDetails);
+export const signUpUser = createAsyncThunk('/signUpUser', async (userDetails: UserDetails) => {
+  return await userController.createUser(userDetails);
 });

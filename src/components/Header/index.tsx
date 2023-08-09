@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import AuthenticationModal from './Authentication';
 import { Button } from '../common/Button';
 import { useLockedBody } from 'usehooks-ts';
-import { useSelector } from 'react-redux';
-import { RootState } from './Authentication/AuthForm';
+import { Link } from 'react-router-dom';
+import { useAppSelector } from '@/store';
 
 export type AuthModalTypes = 'signIn' | 'signUp';
 
@@ -11,7 +11,7 @@ export const Header = () => {
   const [openedModal, setOpenedModal] = useState<AuthModalTypes | null>(null);
   const [isScrollLocked, setScrollLocked] = useState(false);
 
-  const currentUser = useSelector((state: RootState) => state.currentUser.currentUser);
+  const currentUser = useAppSelector(state => state.user.currentUser);
 
   const closeModal = () => {
     setOpenedModal(null);
@@ -34,12 +34,12 @@ export const Header = () => {
   return (
     <header className="shadow">
       <div className="m-auto flex  h-20 max-w-screen-lg items-center justify-between p-4 ">
-        <div className="flex items-center">
-          <img className="h-10 w-10" src="images/puzzle.png" alt="" />
-          <p className="text-3xl text-cyan-700">Nonograms</p>
-        </div>
+        <Link to={'/'} className="flex cursor-pointer items-center">
+          <img className="h-10 w-10" src="/images/puzzle.png" alt="" />
+          <p className="text-3xl font-semibold text-cyan-700">Challenger</p>
+        </Link>
         {currentUser ? (
-          <img src="images/user.png" className="w-14" />
+          <img src="/images/user.png" className="w-14" />
         ) : (
           <div className="flex items-center gap-5">
             <Button children="Register" onClick={() => onButtonClick('signUp')} variant="secondary" />

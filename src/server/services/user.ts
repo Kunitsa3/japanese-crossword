@@ -1,3 +1,5 @@
+import { getFromStorage, setToStorage } from './storage';
+
 export interface UserDetails {
   email?: string;
   username: string;
@@ -5,35 +7,30 @@ export interface UserDetails {
   confirmPassword?: string;
 }
 
-export const getUsers = (): UserDetails[] => {
-  const localStorageUsers = localStorage.getItem('users');
+const USERS_STORAGE_KEY = 'users';
 
-  if (localStorageUsers) {
-    return JSON.parse(localStorageUsers);
-  } else {
-    return [];
-  }
-};
+export const getUsers = () => getFromStorage<UserDetails[]>(USERS_STORAGE_KEY) || [];
 
 export const createUser = (userDetails: UserDetails) =>
   new Promise<UserDetails>((resolve, reject) => {
-    const currentUsers = getUsers();
-    const user = currentUsers.find(el => el.email === userDetails.email);
+    const users = getUsers();
+    const user = users.find(el => el.email === userDetails.email);
 
     if (user) {
       setTimeout(() => reject(new Error(`An account for email address already exists`)), 1000);
       return;
     }
-    currentUsers.push(userDetails);
-    localStorage.setItem('users', JSON.stringify(currentUsers));
+
+    users.push(userDetails);
+    setToStorage(USERS_STORAGE_KEY, users);
 
     setTimeout(() => resolve(userDetails), 1000);
   });
 
 export const signInUser = (userDetails: UserDetails) =>
   new Promise<UserDetails>((resolve, reject) => {
-    const currentUsers = getUsers();
-    const user = currentUsers.find(el => el.username === userDetails.username);
+    const users = getUsers();
+    const user = users.find(el => el.username === userDetails.username);
 
     if (user?.password === userDetails.password) {
       setTimeout(() => resolve(userDetails), 1000);

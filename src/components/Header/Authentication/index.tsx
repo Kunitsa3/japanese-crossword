@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import Modal from '../../common/Modal';
+import Modal from '@/components/common/Modal';
 import { SignIn } from './SignIn';
 import { SignUp } from './SignUp';
 import { AuthModalTypes } from '..';
