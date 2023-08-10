@@ -4,6 +4,7 @@ import { Button } from '../common/Button';
 import { useLockedBody } from 'usehooks-ts';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '@/store';
+import { selectCurrentUser } from '@/store/authentication/selectors';
 
 export type AuthModalTypes = 'signIn' | 'signUp';
 
@@ -11,7 +12,7 @@ export const Header = () => {
   const [openedModal, setOpenedModal] = useState<AuthModalTypes | null>(null);
   const [isScrollLocked, setScrollLocked] = useState(false);
 
-  const currentUser = useAppSelector(state => state.user.currentUser);
+  const currentUser = useAppSelector(selectCurrentUser);
 
   const closeModal = () => {
     setOpenedModal(null);

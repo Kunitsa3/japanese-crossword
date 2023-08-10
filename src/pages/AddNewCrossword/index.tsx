@@ -9,8 +9,10 @@ import { FieldValue } from '@/store/pictures';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { getEmptyField } from '@/components/Crossword';
 import { useNavigate } from 'react-router-dom';
+import { getEmptyField } from '@/lib/getEmptyField';
+import { Input } from '@/components/common/Input';
+import { selectPictureError } from '@/store/pictures/selectors';
 
 const getTableValues = (field: FieldValue[][]): number[][] => {
   const filledValuesLength = field.map(el => {
@@ -39,10 +41,10 @@ const validationSchema = z.object({
     message: 'Value must be a multiple of 5',
   }),
   difficulty: z
-    .string({
-      required_error: 'Field is required',
+    .string()
+    .nonempty({
+      message: 'Field is required',
     })
-    .nonempty()
     .refine(val => +val <= 5, {
       message: 'Value must be less then 5',
     }),
@@ -72,11 +74,12 @@ export const AddNewCrossword = () => {
     register,
     handleSubmit,
     watch,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<z.infer<typeof validationSchema>>({
     defaultValues: {
       width: '45',
       height: '45',
+      difficulty: '45',
     },
     mode: 'onChange',
     resolver: zodResolver(validationSchema),
@@ -85,7 +88,7 @@ export const AddNewCrossword = () => {
   const dispatch = useAppDispatch();
   const [width, height] = watch(['width', 'height']);
   const [field, setField] = useState<FieldValue[][]>(getEmptyField(height, width));
-  const errorMessage = useAppSelector(state => state.picture.errorMessage);
+  const errorMessage = useAppSelector(selectPictureError);
 
   useEffect(() => {
     if (errorMessage) {
@@ -101,6 +104,7 @@ export const AddNewCrossword = () => {
     const leftTable = getTableValues(field);
     const topTable = zip(...getTableValues(transposeField)) as number[][];
     const picture = { result: field, leftTable, topTable, width, height, difficulty: data.difficulty };
+
     dispatch(addPicture(picture));
     navigate('/crosswords');
     toast({
@@ -119,16 +123,14 @@ export const AddNewCrossword = () => {
       <div className="flex flex-col items-center justify-center gap-6">
         {inputs.map((input, id) => {
           return (
-            <div key={id}>
-              <label className="mb-2 mt-6 block text-sm font-medium text-cyan-700 dark:text-white">{input.label}</label>
-
-              <input
-                {...register(input.name)}
-                placeholder={input.placeholder}
-                className="focus:cyan-700 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 outline-none focus:border-cyan-700"
-              />
-              {errors[input.name] && <p className="text-red-700">{errors[input.name]?.message?.toString()}</p>}
-            </div>
+            <Input
+              label={input.label}
+              name={input.name}
+              placeholder={input.placeholder}
+              errors={errors}
+              register={register}
+              key={id}
+            />
           );
         })}
         <div className="mt-10 flex justify-center">
@@ -136,7 +138,7 @@ export const AddNewCrossword = () => {
             type="button"
             className="px-16"
             onClick={() => {
-              if (!errors.height && !errors.width && !errors.difficulty) {
+              if (isValid) {
                 setField(getEmptyField(height, width));
               }
             }}

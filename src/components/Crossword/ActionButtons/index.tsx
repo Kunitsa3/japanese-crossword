@@ -7,9 +7,9 @@ interface ActionButtonsProps {
 
 export const ActionButtons: FC<ActionButtonsProps> = ({ buttonsDetails }) => (
   <div className="mt-10 flex gap-5">
-    {buttonsDetails.map((button, index) => (
-      <Button key={index} onClick={button.onClick}>
-        {button.label}
+    {buttonsDetails.map(({ onClick, label }, index) => (
+      <Button key={index} onClick={onClick}>
+        {label}
       </Button>
     ))}
   </div>

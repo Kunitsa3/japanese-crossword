@@ -6,11 +6,14 @@ import store, { useAppSelector } from '@/store';
 import { useToast } from '@/components/ui/use-toast';
 import Spinner from '@/components/common/Spinner';
 import { useEffect } from 'react';
+import { selectUserError, selectUserLoading } from '@/store/authentication/selectors';
+import { Input } from '@/components/common/Input';
 
 interface Input<T> {
   label: string;
   name: T;
   placeholder?: string;
+  type?: string;
 }
 
 interface AuthFormProps<T extends z.Schema<any, any>> {
@@ -36,8 +39,8 @@ export const AuthForm = <T extends z.Schema<any, any>>({
     resolver: zodResolver(validationSchema),
   });
 
-  const authenticationLoadingStatus = useAppSelector(state => state.user.loading);
-  const errorMessage = useAppSelector(state => state.user.errorMessage);
+  const authenticationLoadingStatus = useAppSelector(selectUserLoading);
+  const errorMessage = useAppSelector(selectUserError);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -56,18 +59,17 @@ export const AuthForm = <T extends z.Schema<any, any>>({
       })}
     >
       <p className=" text-center text-lg font-semibold text-cyan-700">{title}</p>
-      {inputs.map((input, id) => {
+      {inputs.map(({ label, name, placeholder, type }, id) => {
         return (
-          <div key={id}>
-            <label className="mb-2 mt-6 block text-sm font-medium text-cyan-700 dark:text-white">{input.label}</label>
-
-            <input
-              {...register(input.name)}
-              placeholder={input.placeholder}
-              className="focus:cyan-700 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 outline-none focus:border-cyan-700"
-            />
-            {errors[input.name] && <p className="text-red-700">{errors[input.name]?.message?.toString()}</p>}
-          </div>
+          <Input
+            label={label}
+            name={name}
+            placeholder={placeholder}
+            errors={errors}
+            register={register}
+            type={type}
+            key={id}
+          />
         );
       })}
       <div className="mt-10">

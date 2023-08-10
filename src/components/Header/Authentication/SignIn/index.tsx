@@ -30,6 +30,7 @@ export const SignIn: FC<SignInProps> = ({ setSignUpModalOpened }) => {
             label: 'Password',
             name: 'password',
             placeholder: '**********',
+            type: 'password',
           },
         ]}
         validationSchema={validationSchema}

@@ -44,11 +44,13 @@ export const SignUp: FC<SignUpProps> = ({ setSignInModalOpened }) => {
             label: 'Password',
             name: 'password',
             placeholder: '***********',
+            type: 'password',
           },
           {
             label: 'Confirm Password',
             name: 'confirmPassword',
             placeholder: '***********',
+            type: 'password',
           },
         ]}
         validationSchema={validationSchema}

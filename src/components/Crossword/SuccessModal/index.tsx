@@ -1,5 +1,5 @@
 import Modal from '@/components/common/Modal';
-import { Dispatch, FC, SetStateAction } from 'react';
+import { FC } from 'react';
 import { Link } from 'react-router-dom';
 
 interface SuccessModalProps {

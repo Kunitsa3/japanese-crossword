@@ -8,9 +8,10 @@ interface ImageWithTextProps {
   src: string;
   imageRight?: boolean;
   buttonText?: string;
+  onButtonClick?: () => void;
 }
 
-export const ImageWithText: FC<ImageWithTextProps> = ({ title, text, src, imageRight, buttonText }) => {
+export const ImageWithText: FC<ImageWithTextProps> = ({ title, text, src, imageRight, buttonText, onButtonClick }) => {
   return (
     <div
       className={cn('m-auto flex max-w-screen-lg items-center gap-12 py-8 text-xl', imageRight && 'flex-row-reverse')}
@@ -19,7 +20,11 @@ export const ImageWithText: FC<ImageWithTextProps> = ({ title, text, src, imageR
       <div className="flex w-1/2 flex-col gap-4">
         <h2 className="text-3xl font-bold text-cyan-700">{title}</h2>
         <div className="flex gap-4">{text}</div>
-        {buttonText && <Button className="mt-5">{buttonText}</Button>}
+        {buttonText && (
+          <Button className="mt-5" onClick={onButtonClick}>
+            {buttonText}
+          </Button>
+        )}
       </div>
     </div>
   );

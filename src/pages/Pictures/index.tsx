@@ -1,14 +1,17 @@
 import { ImageWithText } from '@/components/ImageWithText';
 import { PictureCard } from '@/pages/Pictures/PictureCard';
 import { useAppDispatch, useAppSelector } from '@/store';
+import { selectCurrentUser } from '@/store/authentication/selectors';
 import { getPictures } from '@/store/pictures/asyncThunks';
+import { selectPictures } from '@/store/pictures/selectors';
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export const Pictures = () => {
   const dispatch = useAppDispatch();
-  const pictures = useAppSelector(state => state.picture.pictures);
-  const currentUser = useAppSelector(state => state.user.currentUser);
+  const navigate = useNavigate();
+  const pictures = useAppSelector(selectPictures);
+  const currentUser = useAppSelector(selectCurrentUser);
 
   useEffect(() => {
     dispatch(getPictures());
@@ -27,6 +30,7 @@ export const Pictures = () => {
           </>
         }
         buttonText="How to solve"
+        onButtonClick={() => navigate('/how-to-solve')}
       />
 
       <div className="grid grid-cols-2 gap-10 pb-20">

@@ -4,15 +4,14 @@ import { Table } from './Table';
 import { FieldValue, Picture } from '@/store/pictures';
 import { Field } from './Field';
 import { SuccessModal } from './SuccessModal';
-import _, { isEqual } from 'lodash';
+import { isEqual } from 'lodash';
+import { getEmptyField } from '@/lib/getEmptyField';
 
 interface CrosswordProps {
   currentPicture: Picture;
 }
 
-export const getEmptyField = (height: string, width: string) => new Array(+height).fill(new Array(+width).fill(0));
-
-export const checkCrosswordOnValidity = (field: FieldValue[][], answer: FieldValue[][]) => {
+const checkCrosswordOnValidity = (field: FieldValue[][], answer: FieldValue[][]) => {
   const fieldWithoutCrossElement = field.map(row => row.map(cellValue => (cellValue === 'X' ? 0 : cellValue)));
 
   return isEqual(fieldWithoutCrossElement, answer);
