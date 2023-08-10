@@ -1,6 +1,6 @@
 import { Field } from '@/components/Crossword/Field';
 import { Button } from '@/components/common/Button';
-import { FC, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { zip } from 'lodash';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { addPicture } from '@/store/pictures/asyncThunks';
