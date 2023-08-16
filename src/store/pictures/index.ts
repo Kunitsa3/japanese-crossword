@@ -6,8 +6,8 @@ export type FieldValue = 'X' | 1 | 0;
 export interface Picture {
   id: string;
   difficulty: string;
-  width: string;
-  height: string;
+  width: number;
+  height: number;
   topTable: number[][];
   leftTable: number[][];
   result: FieldValue[][];

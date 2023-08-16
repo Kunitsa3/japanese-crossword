@@ -69,13 +69,15 @@ const inputs = [
   },
 ] as const;
 
+type FormValues = z.infer<typeof validationSchema>;
+
 export const AddNewCrossword = () => {
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors, isValid },
-  } = useForm<z.infer<typeof validationSchema>>({
+  } = useForm<FormValues>({
     defaultValues: {
       width: '45',
       height: '45',
@@ -87,7 +89,7 @@ export const AddNewCrossword = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [width, height] = watch(['width', 'height']);
-  const [field, setField] = useState<FieldValue[][]>(getEmptyField(height, width));
+  const [field, setField] = useState<FieldValue[][]>(getEmptyField(+height, +width));
   const errorMessage = useAppSelector(selectPictureError);
 
   useEffect(() => {
@@ -99,11 +101,18 @@ export const AddNewCrossword = () => {
     }
   }, [errorMessage]);
 
-  const onSubmit = (data: z.infer<typeof validationSchema>) => {
+  const onSubmit = (data: FormValues) => {
     const transposeField = zip(...field) as FieldValue[][];
     const leftTable = getTableValues(field);
     const topTable = zip(...getTableValues(transposeField)) as number[][];
-    const picture = { result: field, leftTable, topTable, width, height, difficulty: data.difficulty };
+    const picture = {
+      result: field,
+      leftTable,
+      topTable,
+      width: +data.width,
+      height: +data.height,
+      difficulty: data.difficulty,
+    };
 
     dispatch(addPicture(picture));
     navigate('/crosswords');
@@ -139,7 +148,7 @@ export const AddNewCrossword = () => {
             className="px-16"
             onClick={() => {
               if (isValid) {
-                setField(getEmptyField(height, width));
+                setField(getEmptyField(+height, +width));
               }
             }}
           >

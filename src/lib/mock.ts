@@ -4,8 +4,8 @@ export const pictures: Pictures = [
   {
     id: '0',
     difficulty: '1',
-    width: '5',
-    height: '5',
+    width: 5,
+    height: 5,
     topTable: [
       [0, 1, 0, 1, 0],
       [0, 1, 3, 1, 0],
@@ -29,8 +29,8 @@ export const pictures: Pictures = [
   {
     id: '1',
     difficulty: '5',
-    width: '30',
-    height: '30',
+    width: 30,
+    height: 30,
     topTable: [
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 2, 2, 3, 4, 5, 5, 5, 2, 1, 0, 0, 5, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0],
@@ -106,8 +106,8 @@ export const pictures: Pictures = [
   {
     id: '2',
     difficulty: '4',
-    width: '45',
-    height: '45',
+    width: 45,
+    height: 45,
     result: [
       [
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
