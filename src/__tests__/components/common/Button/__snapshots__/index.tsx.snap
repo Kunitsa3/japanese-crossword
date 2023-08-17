@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test button with default variant 1`] = `
+<DocumentFragment>
+  <button
+    class="px-4 py-1.5 text-base font-medium uppercase text-cyan-700 hover:text-cyan-600 rounded border border-cyan-700"
+  />
+</DocumentFragment>
+`;
+
+exports[`test button with secondary variant 1`] = `
+<DocumentFragment>
+  <button
+    class="px-4 py-1.5 text-base font-medium uppercase text-cyan-700 hover:text-cyan-600"
+  />
+</DocumentFragment>
+`;
